@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 16, 2024 at 06:23 AM
+-- Generation Time: Nov 05, 2024 at 06:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,9 +41,9 @@ CREATE TABLE `tb_alternatif` (
 --
 
 INSERT INTO `tb_alternatif` (`kode_alternatif`, `tanggal`, `nama_alternatif`, `kategori`, `total`, `rank`) VALUES
-('w3', '2024-03-04', 'asdasd', '', 1, 0),
-('w2', '2024-03-04', 'as', '', 1, 0),
-('w1', '2024-03-04', 'kebakaran', '', 0, 0);
+('A3', '2024-11-14', 'Pendapatan naik', 'Peluang', 0, 0),
+('A2', '2024-11-14', 'pencurian', 'Ancaman', 1, 0),
+('A1', '2024-11-14', 'kebakaran', 'Ancaman', 0.53707136237257, 0);
 
 -- --------------------------------------------------------
 
@@ -62,9 +62,8 @@ CREATE TABLE `tb_experts` (
 --
 
 INSERT INTO `tb_experts` (`kode_expert`, `tanggal`, `nama_expert`) VALUES
-('a1', '2024-03-04', 'andita'),
-('f1', '2024-03-04', 'fadia'),
-('h1', '2024-03-04', 'haekal');
+('E2', '2024-11-14', 'Fadia'),
+('E1', '2024-11-14', 'Andita');
 
 -- --------------------------------------------------------
 
@@ -84,8 +83,9 @@ CREATE TABLE `tb_kriteria` (
 --
 
 INSERT INTO `tb_kriteria` (`kode_kriteria`, `tanggal`, `nama_kriteria`, `atribut`) VALUES
-('C2', '2024-03-04', 'Dampak', 'benefit'),
-('C1', '2024-03-04', 'Kemungkinan', 'benefit');
+('C2', '2024-11-14', 'Dampak', 'benefit'),
+('C3', '2024-11-14', 'Efektivitas Pengendalian Risiko', 'cost'),
+('C1', '2024-11-14', 'Kemungkinan', 'benefit');
 
 -- --------------------------------------------------------
 
@@ -104,7 +104,8 @@ CREATE TABLE `tb_periode` (
 --
 
 INSERT INTO `tb_periode` (`tanggal`, `nama`, `keterangan`) VALUES
-('2024-03-04', 'coba', '');
+('2024-11-06', 'B', ''),
+('2024-11-14', 'A', '');
 
 -- --------------------------------------------------------
 
@@ -115,22 +116,35 @@ INSERT INTO `tb_periode` (`tanggal`, `nama`, `keterangan`) VALUES
 CREATE TABLE `tb_rel_alternatif` (
   `ID` int(11) NOT NULL,
   `tanggal` date DEFAULT NULL,
+  `kode_expert` varchar(16) NOT NULL,
   `kode_alternatif` varchar(16) DEFAULT NULL,
   `kode_kriteria` varchar(16) DEFAULT NULL,
-  `nilai` double DEFAULT NULL
+  `nilai` decimal(10,2) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `tb_rel_alternatif`
 --
 
-INSERT INTO `tb_rel_alternatif` (`ID`, `tanggal`, `kode_alternatif`, `kode_kriteria`, `nilai`) VALUES
-(701, '2024-03-04', 'w3', 'C1', 4),
-(700, '2024-03-04', 'w2', 'C1', 2),
-(699, '2024-03-04', 'w1', 'C1', 6),
-(702, '2024-03-04', 'w1', 'C2', 4),
-(703, '2024-03-04', 'w2', 'C2', 3),
-(704, '2024-03-04', 'w3', 'C2', 3);
+INSERT INTO `tb_rel_alternatif` (`ID`, `tanggal`, `kode_expert`, `kode_alternatif`, `kode_kriteria`, `nilai`) VALUES
+(880, '2024-11-14', 'E1', 'A3', 'C1', 2.00),
+(879, '2024-11-14', 'E1', 'A3', 'C3', 3.00),
+(878, '2024-11-14', 'E1', 'A3', 'C2', 1.00),
+(877, '2024-11-14', 'E2', 'A3', 'C1', 4.00),
+(876, '2024-11-14', 'E2', 'A3', 'C3', 2.00),
+(875, '2024-11-14', 'E2', 'A3', 'C2', 3.00),
+(874, '2024-11-14', 'E1', 'A2', 'C1', 2.00),
+(873, '2024-11-14', 'E1', 'A2', 'C3', 3.00),
+(872, '2024-11-14', 'E1', 'A2', 'C2', 1.00),
+(871, '2024-11-14', 'E2', 'A2', 'C1', 3.00),
+(870, '2024-11-14', 'E2', 'A2', 'C3', 4.00),
+(869, '2024-11-14', 'E2', 'A2', 'C2', 2.00),
+(868, '2024-11-14', 'E1', 'A1', 'C1', 3.00),
+(867, '2024-11-14', 'E1', 'A1', 'C3', 2.00),
+(866, '2024-11-14', 'E1', 'A1', 'C2', 4.00),
+(865, '2024-11-14', 'E2', 'A1', 'C1', 2.00),
+(864, '2024-11-14', 'E2', 'A1', 'C3', 4.00),
+(863, '2024-11-14', 'E2', 'A1', 'C2', 5.00);
 
 -- --------------------------------------------------------
 
@@ -141,6 +155,7 @@ INSERT INTO `tb_rel_alternatif` (`ID`, `tanggal`, `kode_alternatif`, `kode_krite
 CREATE TABLE `tb_rel_kriteria` (
   `ID` int(11) NOT NULL,
   `tanggal` date DEFAULT NULL,
+  `kode_expert` varchar(16) NOT NULL,
   `ID1` varchar(16) DEFAULT NULL,
   `ID2` varchar(16) DEFAULT NULL,
   `nilai` double DEFAULT NULL
@@ -150,11 +165,25 @@ CREATE TABLE `tb_rel_kriteria` (
 -- Dumping data for table `tb_rel_kriteria`
 --
 
-INSERT INTO `tb_rel_kriteria` (`ID`, `tanggal`, `ID1`, `ID2`, `nilai`) VALUES
-(435, '2024-03-04', 'C1', 'C2', 0.142857142),
-(434, '2024-03-04', 'C2', 'C2', 1),
-(433, '2024-03-04', 'C2', 'C1', 7),
-(432, '2024-03-04', 'C1', 'C1', 1);
+INSERT INTO `tb_rel_kriteria` (`ID`, `tanggal`, `kode_expert`, `ID1`, `ID2`, `nilai`) VALUES
+(824, '2024-11-14', 'E1', 'C3', 'C3', 1),
+(823, '2024-11-14', 'E1', 'C3', 'C2', 4),
+(822, '2024-11-14', 'E1', 'C3', 'C1', 4),
+(821, '2024-11-14', 'E1', 'C2', 'C3', 0.25),
+(820, '2024-11-14', 'E1', 'C2', 'C2', 1),
+(819, '2024-11-14', 'E1', 'C2', 'C1', 1),
+(818, '2024-11-14', 'E1', 'C1', 'C3', 0.25),
+(817, '2024-11-14', 'E1', 'C1', 'C2', 1),
+(816, '2024-11-14', 'E1', 'C1', 'C1', 1),
+(815, '2024-11-14', 'E2', 'C3', 'C3', 1),
+(814, '2024-11-14', 'E2', 'C3', 'C2', 2),
+(813, '2024-11-14', 'E2', 'C3', 'C1', 2),
+(812, '2024-11-14', 'E2', 'C2', 'C3', 0.5),
+(811, '2024-11-14', 'E2', 'C2', 'C2', 1),
+(810, '2024-11-14', 'E2', 'C2', 'C1', 0.5),
+(809, '2024-11-14', 'E2', 'C1', 'C3', 0.5),
+(808, '2024-11-14', 'E2', 'C1', 'C2', 2),
+(807, '2024-11-14', 'E2', 'C1', 'C1', 1);
 
 -- --------------------------------------------------------
 
@@ -227,13 +256,13 @@ ALTER TABLE `tb_rel_kriteria`
 -- AUTO_INCREMENT for table `tb_rel_alternatif`
 --
 ALTER TABLE `tb_rel_alternatif`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=768;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=881;
 
 --
 -- AUTO_INCREMENT for table `tb_rel_kriteria`
 --
 ALTER TABLE `tb_rel_kriteria`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=445;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=825;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
