@@ -1,79 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sistem Pendukung Keputusan</title>
-	<link rel="icon" href="assets/img/icon.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="icon" href="admin/assets/img/icon.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+      integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <style>
-        .body{
-            background: #e4e9f7;
+        .cstm {
+            height: 100vh;
         }
 
-        .container{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 90vh;
-        }
-        
-        .box{
-            background: #fdfdfd;
-            display: flex;
-            flex-direction: column;
-            padding: 25px 25px;
-            border-radius: 20px;
-            box-shadow: 0 0 128px 0 rgba(0,0,0,0.1),
-                        0 32px 64px -48px rgba(0,0,0,0.5);
+        .card-cstm {
+            width: 400px;
         }
 
-        .form-box{
-            width: 275px;
-        }
-
-        .form-box header{
-            font-family: verdana;
-            font-size: 25px;
-            font-weight: 600;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e6e6e6;
-            margin-bottom: 10px;
-        }
-
-        .form-signin{
-            display: flex;
-            margin-bottom: 10px;
-            flex-direction: column;
-        }
-
-        .form-group{
-            margin-bottom: 12px;
-        }
-
-        .form-control{
-            height: 30px;
-            width: 100%;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            outline: none;
-        }
-
-        .btn{
-            height: 35px;
-            background: #337AB7;
-            border: 0;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 15px;
-            cursor: pointer;
-            transition-duration: 0.4s;
-        }
-
-        .btn1{
-            background: #337AB7;
-        }
-        
-        .btn1:hover{
-            background: #2A6693;
+        img {
+            width: 40px;
         }
 
         .container-alert{
@@ -90,14 +40,14 @@
 </head>
 
 <body>
-<div class="container">
-    <div class="box form-box">
+<div class="container d-flex justify-content-center align-items-center cstm">
+    <div class="row">
         <?php
             if (isset($_GET['aksi'])){
                 if ($_GET['aksi']=='login'){
                     session_start();
-                    include 'config.php'; 
-                    include 'functions.php';
+                    include 'admin/config.php'; 
+                    include 'admin/functions.php';
 
             $user = $_POST['user'];
             $pass = $_POST['pass'];
@@ -105,32 +55,35 @@
             $row = $db->get_row("SELECT * FROM tb_user WHERE user='$user' AND pass='$pass'");
             if ($row) {
                 $_SESSION['index'] =  $row->user;
-                header("location:header.php");
+                header("location:admin/index.php");
             } else {
-                header("location:header.php?pesan=gagal");
+                header("location:index.php?pesan=gagal");
             } 
         }
     }
     ?>
-    <div>
-        <header>Login<img src="assets/img/icon.png" style="float: right; width:15%"></img></header>
-    </div>
-        <form class="form-signin" action="index.php?aksi=login" method="post">
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="Username" name="user" autofocus />
-            </div>
-            <div class="form-group">
-                <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="pass" />
-            </div>
-            <button class="btn btn1" type="submit"><span class="glyphicon glyphicon-log-in"></span> Masuk</button>
-        </form>
+    <div class="card p-3 card-cstm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Login</h4>
+            <img src="admin/assets/img/icon.png"></img>
+        </div>
         <?php 
         if(isset($_GET['pesan'])){
             if($_GET['pesan'] == "gagal"){
-                echo "<div class='container-alert'>Username dan Password Salah</div>";
+                echo "<div class='bg-danger text-white text-center p-2 rounded-2 mb-3'>Username dan Password Salah</div>";
             }
         }
         ?>
+        <form class="form-signin" action="index.php?aksi=login" method="post">
+            <div class="form-group mb-2">
+                <input type="text" class="form-control" placeholder="Username" name="user" autofocus />
+            </div>
+            <div class="form-group mb-2">
+                <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="pass" />
+            </div>
+            <button class="btn btn-primary float-end" type="submit"><span class="glyphicon glyphicon-log-in"></span> Masuk</button>
+        </form>
+    </div>
     </div>
 </div>
 </body>

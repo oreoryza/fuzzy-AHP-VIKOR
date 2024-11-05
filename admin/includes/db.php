@@ -42,4 +42,9 @@ class DB
         $row = mysqli_fetch_row($query);
         return isset($row[0]);
     }
+
+    public function affected_rows()
+    {
+        return mysqli_affected_rows($this->conn);
+    }
 }

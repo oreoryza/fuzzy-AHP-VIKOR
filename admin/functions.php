@@ -1,5 +1,5 @@
 <?php
-error_reporting(); //menyembunyikan error NOTICE dan DEPRECATED
+error_reporting(1); //menyembunyikan error NOTICE dan DEPRECATED
 session_start();
 
 include 'config.php'; //panggil file config.php
@@ -34,7 +34,7 @@ function _session($key, $val = null)
         return $val;
 }
 
-$mod = _get('m');
+$mod = isset($_GET['m']) ? $_GET['m'] : 'home';
 $act = _get('act');
 
 /**
@@ -65,16 +65,74 @@ foreach ($rows as $row) {
     $EXPERT[$row->kode_expert] = $row;
 }
 
-function get_rel_alternatif()
+function get_rel_alternatif($expert = null) 
 {
     global $db;
     global $PERIODE;
-    $rows = $db->get_results("SELECT * FROM tb_rel_alternatif WHERE tanggal = '$_GET[periode]' ORDER BY kode_alternatif, kode_kriteria");
-    $arr = array();
-    foreach ($rows as $row) {
-        $arr[$row->kode_alternatif][$row->kode_kriteria] = $row->nilai;
+    $data = array();
+    
+    // Ambil semua alternatif
+    $alternatifs = $db->get_results("SELECT kode_alternatif FROM tb_alternatif WHERE tanggal='$PERIODE'");
+    
+    // Ambil semua kriteria
+    $kriterias = $db->get_results("SELECT kode_kriteria FROM tb_kriteria WHERE tanggal='$PERIODE'");
+    
+    // Ambil semua expert
+    if (!$expert) {
+        $experts = $db->get_results("SELECT kode_expert FROM tb_experts WHERE tanggal='$PERIODE'");
+    } else {
+        $experts = array((object)array('kode_expert' => $expert));
     }
-    return $arr;
+
+    // Inisialisasi array dengan nilai 0
+    foreach ($alternatifs as $alt) {
+        foreach ($kriterias as $krit) {
+            foreach ($experts as $exp) {
+                // Cek apakah relasi sudah ada di database
+                $existing = $db->get_var("SELECT COUNT(*) FROM tb_rel_alternatif 
+                    WHERE tanggal='$PERIODE' 
+                    AND kode_alternatif='$alt->kode_alternatif' 
+                    AND kode_kriteria='$krit->kode_kriteria'
+                    AND kode_expert='$exp->kode_expert'");
+
+                // Jika tidak ada, masukkan nilai 0
+                if ($existing == 0) {
+                    // Insert nilai 0 ke dalam database
+                    $db->query("INSERT INTO tb_rel_alternatif (tanggal, kode_alternatif, kode_kriteria, kode_expert, nilai) 
+                        VALUES ('$PERIODE', '$alt->kode_alternatif', '$krit->kode_kriteria', '$exp->kode_expert', 0)");
+                }
+            }
+            // Set nilai 0 ke dalam array data
+            $data[$alt->kode_alternatif][$krit->kode_kriteria] = 0;
+        }
+    }
+
+    // Jika expert spesifik diminta
+    if ($expert) {
+        // Ambil nilai yang sudah ada di database untuk expert tersebut
+        $rows = $db->get_results("SELECT kode_alternatif, kode_kriteria, nilai 
+            FROM tb_rel_alternatif 
+            WHERE tanggal='$PERIODE' 
+            AND kode_expert='$expert'");
+        
+        // Update nilai yang sudah ada
+        foreach ($rows as $row) {
+            $data[$row->kode_alternatif][$row->kode_kriteria] = $row->nilai;
+        }
+    } else {
+        // Ambil rata-rata nilai dari semua expert
+        $rows = $db->get_results("SELECT kode_alternatif, kode_kriteria, AVG(nilai) as nilai 
+            FROM tb_rel_alternatif 
+            WHERE tanggal='$PERIODE'
+            GROUP BY kode_alternatif, kode_kriteria");
+        
+        // Update nilai dengan rata-rata
+        foreach ($rows as $row) {
+            $data[$row->kode_alternatif][$row->kode_kriteria] = $row->nilai;
+        }
+    }
+
+    return $data;
 }
 /**
  * option untuk nilai kriteria
@@ -140,7 +198,7 @@ function alert($url)
 function print_msg($msg, $type = 'danger')
 {
     echo ('<div class="alert alert-' . $type . ' alert-dismissible" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"></span></button>' . $msg . '</div>');
+  <span aria-hidden="true"></span></button>' . $msg . '</div>');
 }
 
 /**
@@ -211,4 +269,94 @@ function isActive($name)
     }
 
     return get('m') == $name ?  'active'  : null;
+}
+
+function get_final_nilai() {
+    global $db;
+    $data = array();
+    $experts = $db->get_results("SELECT kode_expert FROM tb_experts WHERE tanggal='$_GET[periode]'");
+    foreach($experts as $expert) {
+        $nilai = get_rel_kriteria($expert->kode_expert);
+        // Gabungkan nilai dari setiap expert
+        foreach($nilai as $k1 => $v1) {
+            foreach($v1 as $k2 => $v2) {
+                if(!isset($data[$k1][$k2])) 
+                    $data[$k1][$k2] = 0;
+                $data[$k1][$k2] += $v2;
+            }
+        }
+    }
+    // Hitung rata-rata
+    $count = count($experts);
+    foreach($data as $k1 => $v1) {
+        foreach($v1 as $k2 => $v2) {
+            $data[$k1][$k2] = $v2 / $count;
+        }
+    }
+    return $data;
+}
+
+function get_final_nilai_fuzzy() {
+    global $db;
+    $data = array();
+    $experts = $db->get_results("SELECT kode_expert FROM tb_experts WHERE tanggal='$_GET[periode]'");
+    
+    foreach($experts as $expert) {
+        $nilai = get_rel_kriteria($expert->kode_expert);
+        // Konversi dan gabungkan nilai dari setiap expert
+        foreach($nilai as $k1 => $v1) {
+            foreach($v1 as $k2 => $v2) {
+                if(!isset($data[$k1][$k2])) {
+                    $data[$k1][$k2] = array(0, 0, 0); // Inisialisasi array fuzzy
+                }
+                $fuzzy = FAHP_get_triangular($v2); // Konversi ke bilangan fuzzy
+                $data[$k1][$k2][0] += $fuzzy[0]; // Lower
+                $data[$k1][$k2][1] += $fuzzy[1]; // Middle
+                $data[$k1][$k2][2] += $fuzzy[2]; // Upper
+            }
+        }
+    }
+    
+    // Hitung rata-rata
+    $count = count($experts);
+    foreach($data as $k1 => &$v1) {
+        foreach($v1 as $k2 => &$v2) {
+            $v2[0] /= $count; // Rata-rata Lower
+            $v2[1] /= $count; // Rata-rata Middle
+            $v2[2] /= $count; // Rata-rata Upper
+        }
+    }
+    
+    return $data;
+}
+
+function get_final_alternatif() {
+    global $db;
+    $data = array();
+    $experts = $db->get_results("SELECT kode_expert FROM tb_experts WHERE tanggal='$_GET[periode]'");
+    foreach($experts as $expert) {
+        $nilai = get_rel_alternatif($expert->kode_expert);
+        // Gab ungkan nilai ke dalam array data
+        foreach ($nilai as $kode_alternatif => $nilai_kriteria) {
+            if (!isset($data[$kode_alternatif])) {
+                $data[$kode_alternatif] = array();
+            }
+            foreach ($nilai_kriteria as $kode_kriteria => $nilai_value) {
+                if (!isset($data[$kode_alternatif][$kode_kriteria])) {
+                    $data[$kode_alternatif][$kode_kriteria] = 0;
+                }
+                $data[$kode_alternatif][$kode_kriteria] += $nilai_value;
+            }
+        }
+    }
+
+    // Hitung rata-rata
+    foreach ($data as $kode_alternatif => $nilai_kriteria) {
+        foreach ($nilai_kriteria as $kode_kriteria => $total_nilai) {
+            $jumlah_expert = count($experts);
+            $data[$kode_alternatif][$kode_kriteria] = $jumlah_expert > 0 ? $total_nilai / $jumlah_expert : 0;
+        }
+    }
+
+    return $data;
 }

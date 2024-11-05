@@ -17,16 +17,52 @@ $nRI = array( //menyimpan nilai RATIO INDEX
  * mengambil nilai perbandingan kriteria dari database 
  * kemudian menyimpan dalam array
  */
-function get_rel_kriteria()
+function get_rel_kriteria($expert = null)
 {
 	global $db;
-	global $PERIODE;
-	$data = array();
-	$rows = $db->get_results("SELECT * FROM tb_rel_kriteria WHERE tanggal='$_GET[periode]' ORDER BY ID1, ID2");
-	foreach ($rows as $row) {
-		$data[$row->ID1][$row->ID2] = $row->nilai;
-	}
-	return $data;
+    global $PERIODE;
+    $data = array();
+    
+    // Ambil semua kriteria
+    $kriteria = $db->get_results("SELECT kode_kriteria FROM tb_kriteria WHERE tanggal='$PERIODE'");
+    
+    // Jika expert tidak ditentukan, ambil semua expert
+    if (!$expert) {
+        $experts = $db->get_results("SELECT kode_expert FROM tb_experts WHERE tanggal='$PERIODE'");
+    } else {
+        $experts = array((object)array('kode_expert' => $expert));
+    }
+
+    foreach ($experts as $exp) {
+        foreach ($kriteria as $k1) {
+            foreach ($kriteria as $k2) {
+                // Cek apakah relasi sudah ada di database
+                $row = $db->get_row("SELECT nilai FROM tb_rel_kriteria 
+                    WHERE tanggal='$PERIODE' 
+                    AND kode_expert='$exp->kode_expert'
+                    AND ID1='$k1->kode_kriteria' 
+                    AND ID2='$k2->kode_kriteria'");
+                
+                if ($row) {
+                    // Jika sudah ada, gunakan nilai dari database
+                    $data[$exp->kode_expert][$k1->kode_kriteria][$k2->kode_kriteria] = $row->nilai;
+                } else {
+                    // Jika belum ada, insert nilai default 1 ke database
+                    $nilai_default = ($k1->kode_kriteria == $k2->kode_kriteria) ? 1 : 1;
+                    $db->query("INSERT INTO tb_rel_kriteria (tanggal, kode_expert, ID1, ID2, nilai) 
+                        VALUES ('$PERIODE', '$exp->kode_expert', '$k1->kode_kriteria', '$k2->kode_kriteria', $nilai_default)");
+                    $data[$exp->kode_expert][$k1->kode_kriteria][$k2->kode_kriteria] = $nilai_default;
+                }
+            }
+        }
+    }
+
+    // Jika hanya satu expert, kembalikan langsung array untuk expert tersebut
+    if ($expert) {
+        return $data[$expert];
+    }
+
+    return $data;
 }
 
 /**
@@ -251,6 +287,7 @@ function AHP_mmult($matriks = array(), $rata = array())
  */
 function AHP_consistency_measure($matriks, $rata)
 {
+	$data = array();
 	$matriks = AHP_mmult($matriks, $rata);
 	foreach ($matriks as $key => $value) {
 		$data[$key] = $value / $rata[$key];

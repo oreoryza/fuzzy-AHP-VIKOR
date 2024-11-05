@@ -1,18 +1,15 @@
-<div class="page-header">
+<div>
     <h1>File</h1>
 </div>
-<div class="panel panel-default" style="box-shadow: rgba(0, 0, 0, 0.10) 0px 5px 5px;">
-    <div class="panel-heading">
-        <form class="form-inline">
+<div class="mt-3">
+    <div class="py-3">
+        <form class="input-group d-flex justify-content-between">
             <input type="hidden" name="m" value="periode" />
             <div class="form-group">
-                <input class="form-control" type="text" placeholder="Pencarian. . ." name="q" value="<?= _get('q') ?>" />
+                <input class="form-control" type="text" placeholder="Search" name="q" value="<?= _get('q') ?>" />
             </div>
-            <div class="form-group">
-                <a class="btn btn-success" href="?m=periode&periode"><span class="glyphicon glyphicon-refresh"></span></a>
-            </div>
-            <div class="form-group" style="float: right">
-                <a class="btn btn-primary" href="?m=periode_tambah"><span class="glyphicon glyphicon-plus"></span> Tambah</a>
+            <div>
+                <a class="btn btn-primary" href="?m=periode_tambah"><span class="glyphicon glyphicon-plus"></span>Tambah</a>
             </div>
         </form>
     </div>
@@ -32,8 +29,8 @@
                 <td style="width:100px"><?= $row->tanggal ?></td>
                 <td><a style="text-decoration:none" href="?m=alternatif&periode=<?=$row->tanggal?>"><?= $row->nama ?><a></td>
                 <td>
-                    <a class="btn btn-xs btn-warning" href="?m=periode_ubah&ID=<?= $row->tanggal ?>"><span class="glyphicon glyphicon-edit"></span></a>
-                    <a class="btn btn-xs btn-danger" href="aksi.php?act=periode_hapus&ID=<?= $row->tanggal ?>" onclick="return confirm('Hapus data?')"><span class="glyphicon glyphicon-trash"></span></a>
+                    <a class="btn btn-xs btn-warning" href="?m=periode_ubah&ID=<?= $row->tanggal ?>"><i class="bi bi-pencil"></i></a>
+                    <a class="btn btn-xs btn-danger" href="aksi.php?act=periode_hapus&ID=<?= $row->tanggal ?>" onclick="return confirm('Hapus data?')"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
         <?php endforeach ?>

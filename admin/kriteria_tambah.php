@@ -1,4 +1,4 @@
-<div class="page-header">
+<div>
     <h1>Tambah Kriteria</h1>
     <small>Periode <?= _get('periode') ?></small>
 </div>
@@ -30,7 +30,7 @@ $kodkrit = $huruf . sprintf("%01s", $urutan);
                     <?= get_atribut_option(set_value('atribut')) ?>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <button class="btn btn-primary" type="submit" value="submit"><span class="glyphicon glyphicon-save"></span> Simpan</button>
                 <a class="btn btn-danger" href="?m=kriteria&periode=<?= _get('periode')?>"><span class="glyphicon glyphicon-arrow-left"></span> Kembali</a>
             </div>

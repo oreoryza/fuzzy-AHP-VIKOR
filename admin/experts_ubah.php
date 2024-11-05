@@ -16,7 +16,7 @@ $row = $db->get_row("SELECT * FROM tb_experts WHERE kode_expert='$_GET[ID]'");
                 <label>Nama expert <span class="text-danger">*</span></label>
                 <input class="form-control" type="text" name="nama_expert" value="<?= $row->nama_expert ?>" />
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <button class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Simpan</button>
                 <a class="btn btn-danger" href="?m=experts&periode=<?= _get('periode')?>"><span class="glyphicon glyphicon-arrow-left"></span> Kembali</a>
             </div>

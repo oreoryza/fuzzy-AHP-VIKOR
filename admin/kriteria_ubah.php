@@ -22,7 +22,7 @@ $row = $db->get_row("SELECT * FROM tb_kriteria WHERE kode_kriteria='$_GET[ID]'")
                     <?= get_atribut_option(set_value('atribut', $row->atribut)) ?>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <button class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Simpan</button>
                 <a class="btn btn-danger" href="?m=kriteria&periode=<?= _get('periode')?>"><span class="glyphicon glyphicon-arrow-left"></span> Kembali</a>
             </div>

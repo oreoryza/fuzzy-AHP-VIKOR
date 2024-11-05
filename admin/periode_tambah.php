@@ -17,7 +17,7 @@
                 <label for="keterangan">Keterangan</label>
                 <textarea name="keterangan" id="keterangan" cols="3" class="form-control"><?= set_value('nama') ?></textarea>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <button class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Simpan</button>
                 <a class="btn btn-danger" href="?m=periode&periode=<?= _get('periode') ?>"><span class="glyphicon glyphicon-arrow-left"></span> Kembali</a>
             </div>

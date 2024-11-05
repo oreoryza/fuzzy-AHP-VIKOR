@@ -1,7 +1,5 @@
-<div class="page-header">
-    <h1>Tambah Alternatif</h1>
-    <small>Periode <?=_get('periode') ?></small>
-</div>
+<h1>Tambah Alternatif</h1>
+<small>Periode <?=_get('periode') ?></small>
 <div class="row">
     <div class="col-sm-6">
         <?php if ($_POST) include 'aksi.php' ?>
@@ -21,7 +19,7 @@
                     <?= get_ket_option(set_value('kategori')) ?>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <button class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Simpan</button>
                 <a class="btn btn-danger" href="?m=alternatif&periode=<?= _get('periode') ?>"><span class="glyphicon glyphicon-arrow-left"></span> Kembali</a>
             </div>

@@ -23,7 +23,7 @@ $row = $db->get_row("SELECT * FROM tb_alternatif WHERE kode_alternatif='$_GET[ID
                     <?= get_ket_option(set_value('kategori', $row->kategori)) ?>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <button class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Simpan</button>
                 <a class="btn btn-danger" href="?m=alternatif&periode=<?= _get('periode')?>"><span class="glyphicon glyphicon-arrow-left"></span> Kembali</a>
             </div>

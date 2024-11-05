@@ -1,4 +1,16 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .detail-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
 <?php
 //warning
 $alt = $db->get_results("SELECT kode_alternatif, nama_alternatif FROM tb_alternatif WHERE tanggal = '$_GET[periode]'");
@@ -18,31 +30,32 @@ if ((array)$nil == null){
     print_msg("Data nilai altenatif kosong. Silahkan isi data terlebih dahulu pada halaman sebelumnya.");
 }
 
+$has_warning = ((array)$kri == null || (array)$alt == null || (array)$nils == 1 || (array)$nil == null);
+
 ?>
 
-<div class="page-header">
-    <h1>Perhitungan</h1>
-<form class="form-inline" action="" method="get">
+<h1>Perhitungan</h1>
+<form class="mt-4" action="" method="get">
         <?php
         //ganti periode
         $periodes = $db->get_results("SELECT * FROM tb_periode ORDER BY tanggal");
         ?>
         <input type="hidden" name="m" value="<?= _get('m') ?>">
-        <div class="form-group">
+        <div class="input-group">
             <select class="form-control" name="periode">
                 <?php foreach ($periodes as $periode) { ?>
                     <option value="<?= $periode->tanggal ?>" <?= $periode->tanggal == _get('periode') ? 'selected' : '' ?>><?= $periode->nama ?></option>
                 <?php } ?>
             </select>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-list-alt"></span> Set </button>
+            <div class="input-group-text">
+                <button class="btn btn-primary" type="submit">Set File</button>
+            </div>
         </div>
     </form>
-</div>
 
-<div class="panel panel-primary" style="box-shadow: rgba(0, 0, 0, 0.10) 0px 5px 5px;">
-    <div class="panel-heading">
+<?php if (!$has_warning): ?>
+<div class="detail-hidden">
+    <div class="mt-5">
         <h3 class="panel-title">
             Matriks Perbandingan Kriteria AHP
         </h3>
@@ -55,7 +68,7 @@ if ((array)$nil == null){
                     <th>Nama</th>
                     <?php
                     //memanggil fungsi get_rel_kriteria
-                    $matriks = get_rel_kriteria();
+                    $matriks = get_final_nilai();
                     foreach ($matriks as $key => $value) : ?>
                         <th><?= $key ?></th>
                     <?php endforeach ?>
@@ -76,8 +89,8 @@ if ((array)$nil == null){
     </div>
 </div>
 
-<div class="panel panel-primary" style="box-shadow: rgba(0, 0, 0, 0.10) 0px 5px 5px;">
-    <div class="panel-heading">
+<div class="detail-hidden" >
+    <div class="mt-5">
         <h3 class="panel-title"> 
             Matriks Perbandingan Kriteria Fuzzy AHP
         </h3>
@@ -88,30 +101,21 @@ if ((array)$nil == null){
                 <tr>
                     <th></th>
                     <?php
-                    $matriks_fahp = FAHP_get_relkriteria($matriks); //memanggil fungsi FAHP_get_relkriteria
-                    $lmu = FAHP_get_lmu($matriks_fahp); //memanggil fungsi FAHP_get_lmu        
-                    $total_lmu = FAHP_get_total_lmu($lmu); //memanggil fungsi FAHP_get_total_lmu 
-
-                    foreach ($matriks as $key => $value) : ?>
+                    $matriks_fahp = get_final_nilai_fuzzy(); // Gunakan fungsi baru
+                    foreach ($matriks_fahp as $key => $value) : ?>
                         <th colspan="3"><?= $key ?></th>
                     <?php endforeach ?>
-                    <th colspan="3">Jumlah Baris</th>
+                </tr>
                 <tr>
+                    <td></td>
+                    <?php foreach ($matriks_fahp as $key => $value) : ?>
+                        <th>l</th>
+                        <th>m</th>
+                        <th>u</th>
+                    <?php endforeach ?>
+                </tr>
             </thead>
-            <tr>
-                <td></td>
-                <?php foreach ($matriks_fahp as $key => $value) : ?>
-                    <th>l</th>
-                    <th>m</th>
-                    <th>u</th>
-                <?php endforeach ?>
-                <th>l</th>
-                <th>m</th>
-                <th>u</th>
-            </tr>
-            <?php
-            //menampilkan matriks_fahp dalam bentuk tabel 
-            foreach ($matriks_fahp as $key => $value) : ?>
+            <?php foreach ($matriks_fahp as $key => $value) : ?>
                 <tr>
                     <th><?= $key ?></th>
                     <?php foreach ($value as $k => $v) :
@@ -121,30 +125,49 @@ if ((array)$nil == null){
                         <td class="<?= $class ?>"><?= round($v[1], 2) ?></td>
                         <td class="<?= $class ?>"><?= round($v[2], 2) ?></td>
                     <?php endforeach ?>
-                    <td><?= round($lmu[$key][0], 2) ?>
-                    <td><?= round($lmu[$key][1], 2) ?>
-                    <td><?= round($lmu[$key][2], 2) ?>
                 </tr>
             <?php endforeach ?>
-            <tr>
-                <td colspan="<?= count($matriks) * 3 + 1 ?>">Total [l, m, u]</td>
-                <td><?= round($total_lmu[0], 2) ?>
-                <td><?= round($total_lmu[1], 2) ?>
-                <td><?= round($total_lmu[2], 2) ?>
-            </tr>
         </table>
     </div>
 </div>
 
-<div class="panel panel-primary" style="box-shadow: rgba(0, 0, 0, 0.10) 0px 5px 5px;">
-    <div class="panel-heading">
+<div class="detail-hidden" >
+    <div class="mt-5">
         <h3 class="panel-title">
             Perhitungan nilai Sintesis (Si)
         </h3>
     </div>
     <div>
         <?php
-        $Si = FAHP_get_Si($lmu, $total_lmu); //memanggil fungsi FAHP_get_Si            
+        // Hitung total baris (lmu)
+        $matriks_fahp = get_final_nilai_fuzzy();
+        $lmu = array();
+        foreach ($matriks_fahp as $key => $values) {
+            $lmu[$key] = array(0, 0, 0);
+            foreach ($values as $val) {
+                $lmu[$key][0] += $val[0]; // Sum lower
+                $lmu[$key][1] += $val[1]; // Sum middle
+                $lmu[$key][2] += $val[2]; // Sum upper
+            }
+        }
+
+        // Hitung total keseluruhan
+        $total_lmu = array(0, 0, 0);
+        foreach ($lmu as $values) {
+            $total_lmu[0] += $values[0]; // Total lower
+            $total_lmu[1] += $values[1]; // Total middle
+            $total_lmu[2] += $values[2]; // Total upper
+        }
+
+        // Hitung nilai sintesis
+        $Si = array();
+        foreach ($lmu as $key => $values) {
+            $Si[$key] = array(
+                $values[0] / $total_lmu[2], // Lower
+                $values[1] / $total_lmu[1], // Middle
+                $values[2] / $total_lmu[0]  // Upper
+            );
+        }
         ?>
         <table class="table table-bordered table-striped table-hover">
             <thead>
@@ -174,12 +197,21 @@ if ((array)$nil == null){
                     <td><?= round($Si[$key][2], 3) ?></td>
                 </tr>
             <?php endforeach ?>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <td><?= round($total_lmu[0], 3) ?></td>
+                    <td><?= round($total_lmu[1], 3) ?></td>
+                    <td><?= round($total_lmu[2], 3) ?></td>
+                    <td colspan="3"></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
 
-<div class="panel panel-primary" style="box-shadow: rgba(0, 0, 0, 0.10) 0px 5px 5px;">
-    <div class="panel-heading">
+<div class="detail-hidden">
+    <div class="mt-5">
         <h3 class="panel-title">
             Penentuan Nilai Vektor (V) dan Nilai Ordinat Defuzzifikasi (d')
         </h3>
@@ -189,7 +221,7 @@ if ((array)$nil == null){
         $mins = array();
         foreach ($KRITERIA as $kode => $kriteria_val) : ?>
             <div class="panel panel-info">
-                <div class="panel-heading">
+                <div class="mt-5">
                     <h3 class="panel-title"><?= $kriteria_val->nama_kriteria ?></h3>
                 </div>
                 <div class="table-responsive">
@@ -232,8 +264,9 @@ if ((array)$nil == null){
         <?php endforeach ?>
     </div>
 </div>
-<div class="panel panel-primary" style="box-shadow: rgba(0, 0, 0, 0.10) 0px 5px 5px;">
-    <div class="panel-heading">
+
+<div class="detail-hidden" >
+    <div class="mt-5">
         <h3 class="panel-title">
             Normalisasi Bobot Vektor (W)
         </h3>
@@ -259,21 +292,21 @@ if ((array)$nil == null){
         </table>
     </div>
 </div>
+
 <?php
 //echo '<pre>';
 $bobot  = array();
 foreach ($mins as $key => $val) {
     $bobot[$key] = $val / $sum;
-}
+} ?>
 
-?>
-<div class="panel panel-primary" style="box-shadow: rgba(0, 0, 0, 0.10) 0px 5px 5px;">
-    <div class="panel-heading">
+<div class="detail-hidden" >
+    <div class="mt-5">
         <h3 class="panel-title">Perhitungan VIKOR</h3>
     </div>
     <div class="panel-body">
         <div class="panel panel-info">
-            <div class="panel-heading">
+            <div class="mt-5">
                 <h3 class="panel-title">
                         Alternatif Kriteria
                 </h3>
@@ -294,7 +327,7 @@ foreach ($mins as $key => $val) {
                     foreach ($KRITERIA as $key => $val) {
                         $atribut[$key] = $val->atribut;
                     }
-                    $rel_alternatif = get_rel_alternatif();
+                    $rel_alternatif = get_final_alternatif();
                     $vikor = new VIKOR($rel_alternatif, $atribut, $bobot, 0.5);
                     $minmax = array();
                     
@@ -311,13 +344,13 @@ foreach ($mins as $key => $val) {
                         <tr>
                             <td colspan="2" class="text-right">Max</td>
                             <?php foreach ($vikor->minmax as $key => $val) : ?>
-                                <td><?= round($val['max'], 3) ?></td>
+                                <td><?= round($val['max'], 2) ?></td>
                             <?php endforeach ?>
                         </tr>
                         <tr>
                             <td colspan="2" class="text-right">Min</td>
                             <?php foreach ($vikor->minmax as $key => $val) : ?>
-                                <td><?= round($val['min'], 3) ?></td>
+                                <td><?= round($val['min'], 2) ?></td>
                             <?php endforeach ?>
                         </tr>
                     </tfoot>
@@ -325,7 +358,7 @@ foreach ($mins as $key => $val) {
             </div>
         </div>
         <div class="panel panel-info">
-            <div class="panel-heading">
+            <div class="mt-5">
                 <h3 class="panel-title">
                         Normalisasi Matriks
                 </h3>
@@ -353,7 +386,7 @@ foreach ($mins as $key => $val) {
         </div>
 
         <div class="panel panel-info">
-            <div class="panel-heading">
+            <div class="mt-5">
                 <h3 class="panel-title">
                         Nilai Utilitas (S) dan Ukuran Regret (R)
                 </h3>
@@ -413,40 +446,6 @@ foreach ($mins as $key => $val) {
                 </table>
             </div>
         </div>
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                        Perangkingan
-                </h3>
-            </div>
-            <div>
-                <table class="table table-bordered table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>Kode</th>
-                            <th>Nama</th>
-                            <th>Q</th>
-                        </tr>
-                    </thead>
-                    <?php
-                    $data = [];
-                    $categories = [];
-                    foreach ($vikor->rank as $key => $val) :
-                        $db->query("UPDATE tb_alternatif SET total='{$vikor->nilai_v[$key]}' WHERE kode_alternatif='$key'");
-                        $data[] = $vikor->nilai_v[$key] * 1;
-                        $categories[] = $ALTERNATIF[$key];
-
-                    ?>
-                        <tr>
-                            <td><?= $key ?></td>
-                            <td><?= $ALTERNATIF[$key] ?></td>
-                            <td><?= round($vikor->nilai_v[$key], 4) ?></td>
-                        </tr>
-                    </div>
-                    <?php endforeach ?>
-                </table>
-            </div>
-        </div>
     </div>
     <div>
         <?php
@@ -454,6 +453,120 @@ foreach ($mins as $key => $val) {
         ?>
     </div>
 </div>
-<div style="float: right">
-<p><a class="btn btn-success" href="cetak.php?m=hitung&periode=<?=_get('periode') ?>"><span class="glyphicon glyphicon-print"></span> Cetak Hasil</a></p>
+<div class="panel panel-info">
+    <div class="mt-5 d-flex justify-content-between">
+        <h3 class="panel-title">
+            Perangkingan
+        </h3>
+        <div>
+            <a class="btn btn-primary" href="?m=hitung_detail&periode=<?= _get('periode')?>">More Detail</a>
+        </div>
+    </div>
+    <div>
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Q</th>
+                </tr>
+            </thead>
+            <?php
+            $data = [];
+            $categories = [];
+            $ranked_alternatives = [];
+            
+            // Urutkan alternatif berdasarkan nilai Q (ascending)
+            $temp_rank = $vikor->nilai_v;
+            asort($temp_rank);
+            
+            $rank = 1;
+            foreach ($temp_rank as $key => $val) {
+                $ranked_alternatives[] = [
+                    'kode' => $key,
+                    'nama' => $ALTERNATIF[$key],
+                    'nilai' => $val,
+                    'rank' => $rank
+                ];
+                $rank++;
+            }
+
+            // Validasi Kondisi 1: Acceptable Advantage
+            $DQ = 1 / (count($ranked_alternatives) - 1); // Threshold DQ
+            $advantage_gap = $ranked_alternatives[1]['nilai'] - $ranked_alternatives[0]['nilai'];
+            $acceptable_advantage = $advantage_gap >= $DQ;
+
+            // Validasi Kondisi 2: Acceptable Stability
+            $acceptable_stability = false;
+            if ($ranked_alternatives[0]['nilai'] == min($vikor->total_s) || 
+                $ranked_alternatives[0]['nilai'] == min($vikor->total_r) || 
+                $ranked_alternatives[0]['nilai'] == min($temp_rank)) {
+                $acceptable_stability = true;
+            }
+
+            foreach ($ranked_alternatives as $alt) :
+                $db->query("UPDATE tb_alternatif SET total='{$alt['nilai']}' WHERE kode_alternatif='{$alt['kode']}'");
+                $data[] = $alt['nilai'] * 1;
+                $categories[] = $alt['nama'];
+            ?>
+                <tr>
+                    <td><?= $alt['rank'] ?></td>
+                    <td><?= $alt['kode'] ?></td>
+                    <td><?= $alt['nama'] ?></td>
+                    <td><?= round($alt['nilai'], 4) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+
+        <div class="detail-hidden mt-4">
+            <h4>Validasi Solusi Kompromi:</h4>
+            <div class="card p-3">
+                <p><strong>1. Acceptable Advantage (Keuntungan yang Dapat Diterima)</strong></p>
+                <?php if ($acceptable_advantage): ?>
+                    <p class="text-success">✓ Terpenuhi: Gap antara alternatif terbaik pertama dan kedua (<?= round($advantage_gap, 4) ?>) 
+                    lebih besar atau sama dengan threshold DQ (<?= round($DQ, 4) ?>)</p>
+                <?php else: ?>
+                    <p class="text-danger">✗ Tidak Terpenuhi: Gap antara alternatif terbaik pertama dan kedua (<?= round($advantage_gap, 4) ?>) 
+                    lebih kecil dari threshold DQ (<?= round($DQ, 4) ?>)</p>
+                    <p>Solusi kompromi: Alternatif berikut memiliki nilai yang hampir sama:</p>
+                    <ul>
+                    <?php
+                    $similar_alternatives = [];
+                    $current_value = $ranked_alternatives[0]['nilai'];
+                    foreach ($ranked_alternatives as $alt) {
+                        if ($alt['nilai'] - $current_value <= $DQ) {
+                            echo "<li>{$alt['kode']} - {$alt['nama']}</li>";
+                        } else {
+                            break;
+                        }
+                    }
+                    ?>
+                    </ul>
+                <?php endif; ?>
+
+                <p class="mt-3"><strong>2. Acceptable Stability in Decision Making (Stabilitas dalam Pengambilan Keputusan)</strong></p>
+                <?php if ($acceptable_stability): ?>
+                    <p class="text-success">✓ Terpenuhi: Alternatif terbaik juga merupakan yang terbaik dalam salah satu atau lebih dari: 
+                    nilai S (group utility), nilai R (individual regret), atau nilai Q (compromise solution)</p>
+                <?php else: ?>
+                    <p class="text-danger">✗ Tidak Terpenuhi: Alternatif terbaik tidak konsisten dalam penilaian S, R, atau Q</p>
+                <?php endif; ?>
+
+                <p class="mt-3"><strong>Kesimpulan:</strong></p>
+                <?php if ($acceptable_advantage && $acceptable_stability): ?>
+                    <p class="text-success">Solusi kompromi valid dan stabil.</p>
+                <?php elseif ($acceptable_advantage): ?>
+                    <p class="text-warning">Solusi kompromi memiliki keuntungan yang dapat diterima tetapi kurang stabil.</p>
+                <?php elseif ($acceptable_stability): ?>
+                    <p class="text-warning">Solusi kompromi stabil tetapi keuntungannya kurang signifikan.</p>
+                <?php else: ?>
+                    <p class="text-danger">Solusi kompromi tidak memenuhi kedua kondisi validasi.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 </div>
+<?php endif; ?>
+</body>
+</html>
