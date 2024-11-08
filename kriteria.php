@@ -1,7 +1,7 @@
 <h1>Kriteria</h1>
 <form class="mt-4" action="" method="get">
         <?php
-        print_msg("Pastikan untuk memilih file yang diinginkan terlebih dahulu", "info");
+        $_GET['periode'] ? '' : print_msg("Pastikan untuk memilih file yang diinginkan terlebih dahulu dengan benar", "info");
         $periodes = $db->get_results("SELECT * FROM tb_periode ORDER BY tanggal");
         ?>
         <input type="hidden" name="m" value="<?= _get('m') ?>">

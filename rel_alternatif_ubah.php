@@ -51,7 +51,7 @@ $row = $db->get_row("SELECT * FROM tb_alternatif WHERE kode_alternatif='$_GET[ID
                 ?>
                     <div class="form-group">
                         <label><?= $krit->nama_kriteria ?></label>
-                        <input type="number" class="form-control" name="nilai[<?= $expert->kode_expert ?>][<?= $krit->kode_kriteria ?>]" value="<?= $nilai ?>" step="0.01">
+                        <input type="number" class="form-control" min="1" max="5" name="nilai[<?= $expert->kode_expert ?>][<?= $krit->kode_kriteria ?>]" value="<?= $nilai ?>">
                     </div>
                 <?php endforeach; ?>
             </div>

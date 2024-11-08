@@ -3,6 +3,17 @@
     padding: 0;
 }
 
+body[data-bs-theme="dark"] {
+    background-color: #121212;
+    color: white;
+    animation-duration: 2s;
+}
+
+body[data-bs-theme="light"] {
+    background-color: white;
+    color: black;
+}
+
 .page-size {
     height: 100%;
     min-height: 100vh;
@@ -147,12 +158,12 @@ a.sidebar-link:hover {
     right: 1.5rem;
     top: 1.4rem;
     transform: rotate(-135deg);
-    transition: all .2s ease-out;
+    transition: all .1s ease-out;
 }
 
 #sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
     transform: rotate(45deg);
-    transition: all .2s ease-out;
+    transition: all .1s ease-out;
 }
 
 .detail-hidden {

@@ -1,23 +1,9 @@
 <?php
 require_once 'functions.php';
 $PERIODE = _get('periode');
-if ($mod == 'login') {
-    $user = esc_field($_POST['user']);
-    $pass = esc_field($_POST['pass']);
-
-    $row = $db->get_row("SELECT * FROM tb_user WHERE user='$user' AND pass='$pass'");
-    if ($row) {
-        $_SESSION['login'] = $row->user;
-        redirect_js("index.php");
-    }
-} elseif ($act == 'logout') {
-    unset($_SESSION['login']);
-    header("location:index.php?m=login");
-}
-
 
 /** ALTERNATIF **/
-elseif ($mod == 'alternatif_tambah') {
+if ($mod == 'alternatif_tambah') {
     $kode_alternatif = $_POST['kode_alternatif'];
     $nama_alternatif = $_POST['nama_alternatif'];
     $kategori = $_POST['kategori'];

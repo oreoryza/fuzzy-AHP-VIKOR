@@ -1,6 +1,5 @@
 <?php
-error_reporting(1); //menyembunyikan error NOTICE dan DEPRECATED
-session_start();
+error_reporting(0); //menyembunyikan error NOTICE dan DEPRECATED
 
 include 'config.php'; //panggil file config.php
 include 'includes/db.php'; //panggil file db.php
@@ -21,15 +20,6 @@ function _get($key, $val = null)
     global $_GET;
     if (isset($_GET[$key]))
         return $_GET[$key];
-    else
-        return $val;
-}
-
-function _session($key, $val = null)
-{
-    global $_SESSION;
-    if (isset($_SESSION[$key]))
-        return $_SESSION[$key];
     else
         return $val;
 }

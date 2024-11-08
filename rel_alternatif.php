@@ -60,7 +60,7 @@ $arr = get_rel_alternatif();
                     <td><?= $row->kode_alternatif ?></td>
                     <td><?= $row->nama_alternatif ?></td>
                     <?php foreach ($arr[$row->kode_alternatif] as $k => $v) : ?>
-                        <td><?= $v ?></td>
+                        <td><?= round($v, 4) ?></td>
                     <?php endforeach ?>
                     <td>
                         <a class="btn btn-xs btn-warning" href="?m=rel_alternatif_ubah&ID=<?= $row->kode_alternatif ?>&periode=<?= _get('periode') ?>"><i class="bi bi-pencil"></i></a>
