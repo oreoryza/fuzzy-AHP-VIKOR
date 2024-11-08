@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 05, 2024 at 06:43 AM
+-- Generation Time: Nov 08, 2024 at 09:14 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,7 @@ CREATE TABLE `tb_alternatif` (
 INSERT INTO `tb_alternatif` (`kode_alternatif`, `tanggal`, `nama_alternatif`, `kategori`, `total`, `rank`) VALUES
 ('A3', '2024-11-14', 'Pendapatan naik', 'Peluang', 0, 0),
 ('A2', '2024-11-14', 'pencurian', 'Ancaman', 1, 0),
-('A1', '2024-11-14', 'kebakaran', 'Ancaman', 0.53707136237257, 0);
+('A1', '2024-11-14', 'kebakaran', 'Ancaman', 0.88213735978431, 0);
 
 -- --------------------------------------------------------
 
@@ -104,7 +104,6 @@ CREATE TABLE `tb_periode` (
 --
 
 INSERT INTO `tb_periode` (`tanggal`, `nama`, `keterangan`) VALUES
-('2024-11-06', 'B', ''),
 ('2024-11-14', 'A', '');
 
 -- --------------------------------------------------------
@@ -177,11 +176,11 @@ INSERT INTO `tb_rel_kriteria` (`ID`, `tanggal`, `kode_expert`, `ID1`, `ID2`, `ni
 (816, '2024-11-14', 'E1', 'C1', 'C1', 1),
 (815, '2024-11-14', 'E2', 'C3', 'C3', 1),
 (814, '2024-11-14', 'E2', 'C3', 'C2', 2),
-(813, '2024-11-14', 'E2', 'C3', 'C1', 2),
+(813, '2024-11-14', 'E2', 'C3', 'C1', 0.125),
 (812, '2024-11-14', 'E2', 'C2', 'C3', 0.5),
 (811, '2024-11-14', 'E2', 'C2', 'C2', 1),
 (810, '2024-11-14', 'E2', 'C2', 'C1', 0.5),
-(809, '2024-11-14', 'E2', 'C1', 'C3', 0.5),
+(809, '2024-11-14', 'E2', 'C1', 'C3', 8),
 (808, '2024-11-14', 'E2', 'C1', 'C2', 2),
 (807, '2024-11-14', 'E2', 'C1', 'C1', 1);
 
